@@ -19,8 +19,11 @@ import {
 } from '@/utils/logic';
 
 function AppContent() {
-  const { loading, error, metrics, derivedSorted, addTask, updateTask, deleteTask, undoDelete, lastDeleted } = useTasksContext();
-  const handleCloseUndo = () => {};
+  const { loading, error, metrics, derivedSorted, addTask, updateTask, deleteTask, undoDelete, lastDeleted, clearLastDeleted } = useTasksContext();
+  // BUG FIX #2: Clear lastDeleted when snackbar closes to prevent phantom data recovery
+  const handleCloseUndo = () => {
+    clearLastDeleted();
+  };
   const [q, setQ] = useState('');
   const [fStatus, setFStatus] = useState<string>('All');
   const [fPriority, setFPriority] = useState<string>('All');
@@ -42,7 +45,7 @@ function AppContent() {
     });
   }, [derivedSorted, q, fStatus, fPriority]);
 
-  const handleAdd = useCallback((payload: Omit<Task, 'id'>) => {
+  const handleAdd = useCallback((payload: Omit<Task, 'id' | 'createdAt' | 'completedAt'>) => {
     addTask(payload);
     setActivity(prev => [createActivity('add', `Added: ${payload.title}`), ...prev].slice(0, 50));
   }, [addTask, createActivity]);

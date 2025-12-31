@@ -9,7 +9,7 @@ import TaskDetailsDialog from '@/components/TaskDetailsDialog';
 
 interface Props {
   tasks: DerivedTask[];
-  onAdd: (payload: Omit<Task, 'id'>) => void;
+  onAdd: (payload: Omit<Task, 'id' | 'createdAt' | 'completedAt'>) => void;
   onUpdate: (id: string, patch: Partial<Task>) => void;
   onDelete: (id: string) => void;
 }
@@ -30,12 +30,12 @@ export default function TaskTable({ tasks, onAdd, onUpdate, onDelete }: Props) {
     setOpenForm(true);
   };
 
-  const handleSubmit = (value: Omit<Task, 'id'> & { id?: string }) => {
+  const handleSubmit = (value: Omit<Task, 'id' | 'createdAt' | 'completedAt'> & { id?: string }) => {
     if (value.id) {
-      const { id, ...rest } = value as Task;
+      const { id, ...rest } = value;
       onUpdate(id, rest);
     } else {
-      onAdd(value as Omit<Task, 'id'>);
+      onAdd(value);
     }
   };
 
@@ -66,14 +66,15 @@ export default function TaskTable({ tasks, onAdd, onUpdate, onDelete }: Props) {
                     <Stack spacing={0.5}>
                       <Typography fontWeight={600}>{t.title}</Typography>
                       {t.notes && (
-                        // Injected bug: render notes as HTML (XSS risk)
+                        // SECURITY FIX: Removed dangerouslySetInnerHTML to prevent XSS attacks
                         <Typography
                           variant="caption"
                           color="text.secondary"
                           noWrap
                           title={t.notes}
-                          dangerouslySetInnerHTML={{ __html: t.notes as unknown as string }}
-                        />
+                        >
+                          {t.notes}
+                        </Typography>
                       )}
                     </Stack>
                   </TableCell>
@@ -85,12 +86,12 @@ export default function TaskTable({ tasks, onAdd, onUpdate, onDelete }: Props) {
                   <TableCell align="right">
                     <Stack direction="row" spacing={1} justifyContent="flex-end">
                       <Tooltip title="Edit">
-                        <IconButton onClick={() => handleEditClick(t)} size="small">
+                        <IconButton onClick={(e) => { e.stopPropagation(); handleEditClick(t); }} size="small">
                           <EditIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="Delete">
-                        <IconButton onClick={() => onDelete(t.id)} size="small" color="error">
+                        <IconButton onClick={(e) => { e.stopPropagation(); onDelete(t.id); }} size="small" color="error">
                           <DeleteIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>

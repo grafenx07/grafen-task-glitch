@@ -1,8 +1,20 @@
 import { DerivedTask, Task } from '@/types';
 
+// BUG FIX #5: Safe ROI calculation with validation for division by zero and invalid inputs
 export function computeROI(revenue: number, timeTaken: number): number | null {
-  // Injected bug: allow non-finite and divide-by-zero to pass through
-  return revenue / (timeTaken as number);
+  // Validate inputs
+  if (!Number.isFinite(revenue) || !Number.isFinite(timeTaken)) {
+    return null;
+  }
+
+  // Handle division by zero - return null instead of Infinity
+  if (timeTaken === 0) {
+    return null;
+  }
+
+  // Calculate and ensure result is finite
+  const roi = revenue / timeTaken;
+  return Number.isFinite(roi) ? roi : null;
 }
 
 export function computePriorityWeight(priority: Task['priority']): 3 | 2 | 1 {
@@ -24,14 +36,20 @@ export function withDerived(task: Task): DerivedTask {
   };
 }
 
+// BUG FIX #3: Stable sorting with deterministic tie-breaker to prevent flickering
 export function sortTasks(tasks: ReadonlyArray<DerivedTask>): DerivedTask[] {
   return [...tasks].sort((a, b) => {
     const aROI = a.roi ?? -Infinity;
     const bROI = b.roi ?? -Infinity;
+
+    // Primary sort: ROI (descending)
     if (bROI !== aROI) return bROI - aROI;
+
+    // Secondary sort: Priority weight (descending)
     if (b.priorityWeight !== a.priorityWeight) return b.priorityWeight - a.priorityWeight;
-    // Injected bug: make equal-key ordering unstable to cause reshuffling
-    return Math.random() < 0.5 ? -1 : 1;
+
+    // Tertiary sort: Alphabetical by title (ascending) - ensures stable ordering
+    return a.title.localeCompare(b.title);
   });
 }
 

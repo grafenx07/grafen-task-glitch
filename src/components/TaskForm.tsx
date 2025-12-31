@@ -17,7 +17,7 @@ import { Priority, Status, Task } from '@/types';
 interface Props {
   open: boolean;
   onClose: () => void;
-  onSubmit: (value: Omit<Task, 'id'> & { id?: string }) => void;
+  onSubmit: (value: Omit<Task, 'id' | 'createdAt' | 'completedAt'> & { id?: string }) => void;
   existingTitles: string[];
   initial?: Task | null;
 }
@@ -69,7 +69,7 @@ export default function TaskForm({ open, onClose, onSubmit, existingTitles, init
 
   const handleSubmit = () => {
     const safeTime = typeof timeTaken === 'number' && timeTaken > 0 ? timeTaken : 1; // auto-correct
-    const payload: Omit<Task, 'id'> & { id?: string } = {
+    const payload: Omit<Task, 'id' | 'createdAt' | 'completedAt'> & { id?: string } = {
       title: title.trim(),
       revenue: typeof revenue === 'number' ? revenue : 0,
       timeTaken: safeTime,
