@@ -1,5 +1,12 @@
 # TaskGlitch - Bug Fixes & Enhancements 🚀
 
+> **🎯 Quick Navigation:**
+> - [📖 Quick Start](./QUICKSTART.md) - Get started in 2 minutes
+> - [🐛 Bug Fixes Details](./BUGFIXES.md) - Technical deep dive
+> - [🧪 Testing Guide](./TESTING.md) - 18 test cases
+> - [🚀 Deployment Guide](./DEPLOYMENT.md) - Deploy to Vercel/Netlify
+> - [📊 Project Summary](./PROJECT_SUMMARY.md) - Executive summary
+
 ## 📝 Project Overview
 This is a **Task Management Web App** designed for sales teams to track, manage, and prioritize tasks based on ROI (Return on Investment). This project was completed as part of an SDE assignment focused on identifying and fixing critical bugs in a production-ready application.
 
